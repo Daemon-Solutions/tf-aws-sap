@@ -16,7 +16,7 @@ resource "aws_instance" "app" {
   }
 
   tags {
-    Name        = "${var.project_prefix}-${var.envname}-${element(split(",",var.app_names),0)}"
+    Name        = "${var.project_prefix}-${var.envtype}-${var.envname}-${element(split(",",var.app_names),0)}"
     Environment = "${var.envname}"
     Service     = "${element(split(",",var.app_names),0)}"
   }
