@@ -1,0 +1,73 @@
+#!/bin/bash -x
+
+# == Disable IPv6
+echo NETWORKING_IPV6=no >> /etc/sysconfig/network
+sed -i /::1/d /etc/hosts
+
+# == Get instance data
+INSTANCEID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id | sed -e 's/-//')
+FULL_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+PRIVIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+AZ=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
+
+# == Hostname
+DNS_APP_NAME=$(echo "${app_name}" | sed 's/_//g')
+sed -i '/HOSTNAME/d' /etc/sysconfig/network
+echo HOSTNAME=$DNS_APP_NAME >> /etc/sysconfig/network
+echo 'preserve_hostname: True' > /etc/cloud/cloud.cfg.d/10_hostname.cfg
+hostnamectl set-hostname $DNS_APP_NAME
+sed -i /$PRIVIP/d /etc/hosts
+echo $PRIVIP $DNS_APP_NAME >> /etc/hosts
+service network restart
+
+# == Swap
+aws ec2 attach-volume --volume-id ${swap_ebs} --instance-id $FULL_INSTANCE_ID --device /dev/xvdb --region ${region}
+while [ ! -e /dev/xvdb ]; do
+  echo "Waiting for /dev/xvdb to attach"
+  sleep 2s
+done
+mkswap /dev/xvdb
+echo "/dev/xvdb swap swap defaults 0 0" >> /etc/fstab
+swapon -a
+
+# == Attach EBS volumes
+for EBS in $(echo "${stripe_ebs_list},${sap_ebs_list}" | sed 's/,/ /g'); do
+  VOLUME=$${EBS%:*}
+  DEVICE=$${EBS#*:}
+
+  aws ec2 attach-volume --volume-id $VOLUME --instance-id $FULL_INSTANCE_ID --device /dev/$DEVICE --region ${region}
+  while [ ! -e /dev/$DEVICE ]; do
+    echo "Waiting for /dev/$DEVICE to attach"
+    sleep 10
+  done
+done
+
+# == Optionally format non-striped volumes
+for EBS in $(echo "${sap_ebs_list}" | sed 's/,/ /g'); do
+  DEVICE=$${EBS#*:}
+  if [ $(blkid | grep $DEVICE | grep -c xfs) -eq 0 ]; then
+    echo "Creating XFS filesystem on /dev/$DEVICE"
+    mkfs -t xfs /dev/$DEVICE
+  fi
+done
+
+# == Puppet Facts
+mkdir -p /etc/facter/facts.d
+echo 'envtype=${envtype}' >> /etc/facter/facts.d/aws.txt
+echo 'envname=${envname}' >> /etc/facter/facts.d/aws.txt
+echo 'profile=${app_name}' >> /etc/facter/facts.d/aws.txt
+echo 'sap_sid=${sap_sid}' >> /etc/facter/facts.d/aws.txt
+echo 'region=${region}' >> /etc/facter/facts.d/aws.txt
+echo "domain=${domain}" >> /etc/facter/facts.d/aws.txt
+
+# == Puppet Repo
+echo "[missguided_sap_puppet]
+name=MG-SAP-Puppet
+baseurl=https://mgsap-${envtype}-repo.s3.amazonaws.com/repos/puppet
+metadata_expire=120s
+enabled=1
+gpgcheck=0" > /etc/yum.repos.d/s3.repo
+
+# == Install code and run Puppet
+yum install -y mgsap-puppet
+puppet-masterless-mco
