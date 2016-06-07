@@ -12,7 +12,7 @@ resource "aws_instance" "app" {
   vpc_security_group_ids      = ["${split(",", var.security_groups)}"]
   root_block_device           = { volume_size = "${var.root_volume_size}" }
   tags {
-    Name        = "${var.project_prefix}-${var.envname}-${var.app_name}"
+    Name        = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}"
     Environment = "${var.envname}"
     Service     = "${var.app_name}"
   }

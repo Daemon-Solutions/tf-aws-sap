@@ -3,7 +3,7 @@ resource "aws_ebs_volume" "stripe1" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-stripe1" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-stripe1" }
 }
 
 resource "aws_ebs_volume" "stripe2" {
@@ -11,7 +11,7 @@ resource "aws_ebs_volume" "stripe2" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-stripe2" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-stripe2" }
 }
 
 resource "aws_ebs_volume" "stripe3" {
@@ -19,7 +19,7 @@ resource "aws_ebs_volume" "stripe3" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-stripe3" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-stripe3" }
 }
 
 resource "aws_ebs_volume" "stripe4" {
@@ -27,7 +27,7 @@ resource "aws_ebs_volume" "stripe4" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-stripe4" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-stripe4" }
 }
 
 resource "aws_ebs_volume" "usr_sap" {
@@ -35,7 +35,7 @@ resource "aws_ebs_volume" "usr_sap" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-usr-sap" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-usr-sap" }
 }
 
 resource "aws_ebs_volume" "media" {
@@ -43,7 +43,7 @@ resource "aws_ebs_volume" "media" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-media" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-media" }
 }
 
 resource "aws_ebs_volume" "swap" {
@@ -51,5 +51,5 @@ resource "aws_ebs_volume" "swap" {
   availability_zone = "${var.availability_zone}"
   encrypted         = "${var.encrypt_ebs_volumes}"
   type              = "gp2"
-  tags { Name = "${var.project_prefix}-${var.envname}-${var.app_name}-swap" }
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-swap" }
 }
