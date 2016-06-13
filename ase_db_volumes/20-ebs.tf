@@ -38,3 +38,11 @@ resource "aws_ebs_volume" "sapdata4" {
   type              = "gp2"
   tags { Name = "${var.name_prefix}-sapdata4" }
 }
+
+resource "aws_ebs_volume" "saplog" {
+  size              = "${var.saplog_size}"
+  availability_zone = "${var.availability_zone}"
+  encrypted         = "${var.encrypt_volumes}"
+  type              = "gp2"
+  tags { Name = "${var.name_prefix}-saplog" }
+}
