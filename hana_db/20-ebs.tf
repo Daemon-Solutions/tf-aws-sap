@@ -46,6 +46,14 @@ resource "aws_ebs_volume" "media" {
   tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-media" }
 }
 
+resource "aws_ebs_volume" "db_backups" {
+  size              = "${var.ebs_db_backups}"
+  availability_zone = "${var.availability_zone}"
+  encrypted         = "${var.encrypt_ebs_volumes}"
+  type              = "standard"
+  tags { Name = "${var.project_prefix}-${var.envtype}-${var.envname}-${var.app_name}-db-backups" }
+}
+
 resource "aws_ebs_volume" "swap" {
   size = "${lookup(var.swap_sizes,var.instance_type)}"
   availability_zone = "${var.availability_zone}"

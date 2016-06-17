@@ -6,6 +6,13 @@ resource "aws_ebs_volume" "sybase" {
   tags { Name = "${var.name_prefix}-sybase" }
 }
 
+resource "aws_ebs_volume" "db_backups" {
+  size              = "${var.db_backups_size}"
+  availability_zone = "${var.availability_zone}"
+  encrypted         = "${var.encrypt_volumes}"
+  type              = "standard"
+  tags { Name = "${var.name_prefix}-db-backups" }
+}
 
 resource "aws_ebs_volume" "sapdata1" {
   size              = "${var.sapdata_size}"
